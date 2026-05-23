@@ -1,0 +1,1 @@
+<span>prueba de vista en scview.php</span>
