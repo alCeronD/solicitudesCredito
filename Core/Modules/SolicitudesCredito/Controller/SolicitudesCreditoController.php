@@ -24,7 +24,6 @@ class SolicitudesCreditoController
     return include_once __DIR__ . '/../View/SCView.php';
   }
 
-  // aca llamo a la CLASE DE GESTION
   public function crearSolicitud()
   {
 
@@ -68,5 +67,57 @@ class SolicitudesCreditoController
         Response::success('Solicitud creada exitosamente', [$resultPost]);
       }
     }
+  }
+
+  public function getSolicitudes()
+  {
+
+    header('Content-Type: application/json; charset=utf-8');
+    $data = Utils::returnGetDecode();
+
+    $filtrosDefinidos = ['id_estado', 'fecha_inicio', 'fecha_fin', 'identificacion_cliente', 'asesor_id'];
+    $mapasDeFiltros = [
+      'id_estado' => 'es.id_estado',
+      'identificacion_cliente' => 'cl.nro_identificacion',
+      'asesor_id' => 'us_asesor.id_rol' # Se usa el id del rol siendo 1 auxiliar y 2 asesor
+    ];
+
+    if (!empty($data['filtros'])) {
+      if (count($data['filtros']) > 1) {
+        Response::success('maximo 1 filtro permito', []);
+      }
+
+      $filtroFinal = [];
+      if (count($data['filtros']) === 1) {
+        foreach ($data['filtros'] as $key => $value) {
+          if (!in_array($key, $filtrosDefinidos)) {
+            Response::success("Filtro $key no permitido", []);
+          }
+          $columnaAlias = $mapasDeFiltros[$key];
+          $filtroFinal[$columnaAlias] = $value;
+        }
+        unset($data['filtros']);
+        $data['filtros'] = $filtroFinal;
+      }
+    }
+
+    // count paginas
+    $countSolicitudes = $this->gstSC->count();
+    $limit = $data['limit'] ?? 3;
+    $page = $data['page'] ?? 1;
+    // Logica del paginado
+    $resultPaginate = Utils::executePaginate($countSolicitudes, $limit, $page);
+    if (empty($data['filtros'])) {
+      $resultSelect = $this->gstSC->select($resultPaginate, []);
+    } else {
+      $resultSelect = $this->gstSC->select($resultPaginate, $data['filtros']);
+    }
+
+
+    if (count($resultSelect) === 0) {
+      Response::success('Sin registros', $resultSelect);
+    }
+
+    Response::success("Solicitudes encontradas $countSolicitudes", $resultSelect);
   }
 }

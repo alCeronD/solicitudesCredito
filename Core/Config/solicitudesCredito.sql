@@ -127,4 +127,66 @@ SELECT * FROM `logSolicitud`;
 
 SELECT * FROM solicitudes;
 
-INSERT INTO clientes(nro_identificacion,nombre_completo,telefono) VALUES (29114652,'Alex Campos', '53565444');
+
+
+# GET solicitudes
+SELECT
+sl.id_solicitud AS 'increment',
+sl.numero_credito AS 'numero_credito',
+cl.nombre_completo AS 'cliente',
+cl.nro_identificacion AS 'identificacion_cliente',
+sl.valor_solicitado AS 'valor_solicitado',
+es.nombre AS 'estado',
+us_asesor.nombre_completo AS 'asesor',
+us_auxiliar.nombre_completo AS 'auxiliar',
+sl.created_at AS 'fecha_creacion'
+FROM solicitudes sl
+INNER JOIN clientes cl ON cl.cliente_id = sl.cliente_id
+INNER JOIN estados es ON sl.estado_id = es.id_estado
+LEFT JOIN usuarios us_asesor ON us_asesor.id_usuario = sl.asesor_id
+LEFT JOIN usuarios us_auxiliar ON us_auxiliar.id_usuario = sl.auxiliar_id ORDER BY sl.id_solicitud ASC LIMIT 3 OFFSET 0;
+
+
+SELECT * FROM solicitudes;
+
+
+SELECT
+      sl.numero_credito AS 'numero_credito',
+      cl.nombre_completo AS 'cliente',
+      cl.nro_identificacion AS 'identificacion_cliente',
+      sl.valor_solicitado AS 'valor_solicitado',
+      es.nombre AS 'estado',
+      us_asesor.nombre_completo AS 'asesor',
+      us_auxiliar.nombre_completo AS 'auxiliar',
+      sl.created_at AS 'fecha_creacion'
+      FROM solicitudes sl
+      INNER JOIN clientes cl ON cl.cliente_id = sl.cliente_id
+      INNER JOIN estados es ON sl.estado_id = es.id_estado
+      LEFT JOIN usuarios us_asesor ON us_asesor.id_usuario = sl.asesor_id
+      LEFT JOIN usuarios us_auxiliar ON us_auxiliar.id_usuario = sl.auxiliar_id WHERE us_asesor.id_usuario = 1 ORDER BY sl.id_solicitud ASC  LIMIT 3 OFFSET 0;
+
+
+
+
+
+      SELECT
+      sl.numero_credito AS 'numero_credito',
+      cl.nombre_completo AS 'cliente',
+      cl.nro_identificacion AS 'identificacion_cliente',
+      sl.valor_solicitado AS 'valor_solicitado',
+      es.nombre AS 'estado',
+      us_asesor.nombre_completo AS 'asesor',
+      us_auxiliar.nombre_completo AS 'auxiliar',
+      sl.created_at AS 'fecha_creacion'
+      FROM solicitudes sl
+      INNER JOIN clientes cl ON cl.cliente_id = sl.cliente_id
+      INNER JOIN estados es ON sl.estado_id = es.id_estado
+      LEFT JOIN usuarios us_asesor ON us_asesor.id_usuario = sl.asesor_id
+      LEFT JOIN usuarios us_auxiliar ON us_auxiliar.id_usuario = sl.auxiliar_id  WHERE us_asesor.id_rol = 2 ORDER BY sl.id_solicitud ASC LIMIT 3 OFFSET 0;
+
+
+      SELECT * FROM usuarios WHERE id_rol = 2;
+
+      SELECT * FROM roles;
+
+SELECT * FROM clientes;
