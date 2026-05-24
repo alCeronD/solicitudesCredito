@@ -21,4 +21,9 @@ class Utils
 
     return $data;
   }
+
+  public static function returnGetEncode(array $datos)
+  {
+    return json_encode($datos);
+  }
 }

@@ -116,3 +116,15 @@ SELECT * FROM solicitudes WHERE numero_credito = "532334";
 DESC clientes;
 
 ALTER TABLE clientes RENAME COLUMN id_cliente TO cliente_id;
+
+SHOW TABLES;
+
+DESC `logSolicitud`;
+
+SHOW CREATE TABLE logSolicitud;
+
+SELECT * FROM `logSolicitud`;
+
+SELECT * FROM solicitudes;
+
+INSERT INTO clientes(nro_identificacion,nombre_completo,telefono) VALUES (29114652,'Alex Campos', '53565444');

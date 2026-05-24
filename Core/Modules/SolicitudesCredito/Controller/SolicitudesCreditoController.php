@@ -4,16 +4,19 @@ include_once 'GstSolicitudesCredito.php';
 include_once __DIR__ . '/../../../Helpers/Utils.php';
 include_once __DIR__ . '/../../../Helpers/Response.php';
 include_once __DIR__ . '/../../Clientes/Controller/GstClientes.php';
+include_once __DIR__ . '/../../LogSolicitudes/Controller/GstLogSolicitudes.php';
 
 
 class SolicitudesCreditoController
 {
   protected GstSolicitudesCredito $gstSC;
   protected GstClientes $gstClientes;
+  protected GstLogSolicitudes $gstLog;
   public function __construct()
   {
     $this->gstSC = new GstSolicitudesCredito();
     $this->gstClientes = new GstClientes();
+    $this->gstLog = new GstLogSolicitudes();
   }
 
   public function renderMainView()
@@ -54,7 +57,16 @@ class SolicitudesCreditoController
     }
     $resultPost = $this->gstSC->insert($data);
     if ($resultPost) {
-      Response::success('Solicitud creada exitosamente', [$resultPost]);
+      // creamos el log luego de validar que todo el proceso fue exitoso.
+      $dataEncode = Utils::returnGetEncode($data);
+      $datosLog['nombre_proceso'] = "CREATE";
+      $datosLog['informacion'] = $dataEncode;
+      $datosLog['created_at'] = "";
+      $datosLog['updated_at'] = "";
+      $resultLog = $this->gstLog->createLog($datosLog);
+      if ($resultLog) {
+        Response::success('Solicitud creada exitosamente', [$resultPost]);
+      }
     }
   }
 }
