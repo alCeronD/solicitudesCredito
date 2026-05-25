@@ -94,6 +94,8 @@ CREATE TABLE IF NOT EXISTS estados(
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='tabla de estado para referenciar con la tabla solicitudes';
 
+ALTER TABLE estados ADD COLUMN descripcion VARCHAR(200) NOT NULL AFTER nombre;
+
 INSERT INTO estados(nombre, created_at, updated_at) VALUES ('Creada', NOW(), NOW()),('En revision', NOW(), NOW()),( 'Aprobada', NOW(), NOW()), ('Rechazada', NOW(), NOW()), ('Desembolsada', NOW(), NOW());
 
 
@@ -160,4 +162,6 @@ DELETE FROM solicitudes;
 UPDATE solicitudes SET estado_id = 1 WHERE id_solicitud = 1;
 SELECT * FROM `logSolicitud`;
 
-SELECT * FROM solicitudes;
+SELECT * FROM estados;
+
+DESC estados;

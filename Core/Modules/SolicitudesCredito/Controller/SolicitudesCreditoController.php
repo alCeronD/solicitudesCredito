@@ -5,6 +5,7 @@ include_once __DIR__ . '/../../../Helpers/Utils.php';
 include_once __DIR__ . '/../../../Helpers/Response.php';
 include_once __DIR__ . '/../../Clientes/Controller/GstClientes.php';
 include_once __DIR__ . '/../../LogSolicitudes/Controller/GstLogSolicitudes.php';
+include_once __DIR__ . '/../../Estados/Controller/GstEstados.php';
 
 
 class SolicitudesCreditoController
@@ -12,11 +13,13 @@ class SolicitudesCreditoController
   protected GstSolicitudesCredito $gstSC;
   protected GstClientes $gstClientes;
   protected GstLogSolicitudes $gstLog;
+  protected GstEstado $gstEstados;
   public function __construct()
   {
     $this->gstSC = new GstSolicitudesCredito();
     $this->gstClientes = new GstClientes();
     $this->gstLog = new GstLogSolicitudes();
+    $this->gstEstados = new GstEstado();
   }
 
   public function renderMainView()
@@ -76,6 +79,27 @@ class SolicitudesCreditoController
   {
     header('Content-Type: application/json; charset=utf-8');
     $data = Utils::returnGetDecode();
+
+    // validar que la solicitud exista
+    $resultDuplicateSolicitud = $this->gstSC->validateUnique('id_solicitud', $data);
+    $resultExistsEstado = $this->gstEstados->select($data);
+
+    // validar que el estado a cambiar exista.
+    if (count($resultExistsEstado) === 0) {
+      Response::success("El estado es incorrecto", [$data['estado_id']]);
+    }
+    // validar que la solicitud exista, si no existe, no ejecutar el cambio de estado.
+    if (count($resultDuplicateSolicitud) === 0) {
+      Response::success("Solicitud Nro {$data['id_solicitud']} no existe", [$data['id_solicitud']]);
+    }
+
+    // validar no cambiar solicitud en estado deseembolzada
+    if ($resultDuplicateSolicitud[0]['estado_id'] === 5) {
+      Response::success('No es posible cambiar una solicitod ya reembolzadad', []);
+    }
+
+    // validar no pasar estado rechazada a aprobada.
+
     $resultActualizarSolicitud = $this->gstSC->update($data);
     if ($resultActualizarSolicitud) {
       $idSolicitud = $data['id_solicitud'];
@@ -93,7 +117,6 @@ class SolicitudesCreditoController
         }
       }
     }
-    die();
   }
 
   public function getSolicitudes()

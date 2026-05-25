@@ -1,21 +1,21 @@
 <?php
+
 require_once __DIR__ . '/../../../Helpers/Crud.php';
-class LogSolicitudesModel extends Crud
+
+class EstadosModel extends Crud
 {
-  protected $id = 'id_log';
-  protected $table = 'logSolicitud';
+  protected $id = 'id_estado';
+  protected $table = 'estados';
   protected $typedCasted;
   protected $campos = [
-    'id_solicitud',
-    'nombre_proceso',
-    'informacion',
+    'nombre',
+    'descripcion',
     'created_at',
     'updated_at'
   ];
   protected $typeCampos = [
-    'nombre_proceso' => 's',
-    'id_solicitud' => 'i',
-    'informacion' => 's',
+    'nombre' => 's',
+    'descripcion' => 's',
     'created_at' => 's',
     'updated_at' => 's'
   ];
