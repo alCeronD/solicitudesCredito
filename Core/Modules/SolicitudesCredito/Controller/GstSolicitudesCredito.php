@@ -98,6 +98,7 @@ class GstSolicitudesCredito
   public function getDetail(array $datos = [])
   {
     $dataId['data'] = $datos;
+    $resultDetail = [];
 
     $this->mlSolicitudCredito->select(true);
     // Extraemos la solicitud
@@ -108,7 +109,6 @@ class GstSolicitudesCredito
     $clienteId = $resultSolicitudId[0]['cliente_id'];
     // falta historico
     $historicoLog = $resultSolicitudId[0]['id_solicitud'];
-    // var_dump($resultSolicitudId);
 
     // estructura para extraer la informacion de manera independiente.
     $dataCliente['data'] = ['cliente_id' => $clienteId];
@@ -120,48 +120,20 @@ class GstSolicitudesCredito
     $resultAuxiliarInfo = $this->mlUser->select(true)->where(true, 'id_usuario')->prepareSql($dataAuxiliar)->get();
     $resultHistoricoInfo = $this->mlLog->select(true)->where(true, 'id_solicitud')->prepareSql($dataHistorico)->get();
 
-    var_dump($resultHistoricoInfo);
-    die();
-
-
-
-
-
-
-    die();
     $idSolicitud = $resultSolicitudId[0]['id_solicitud'];
-    // $sql = "SELECT
-    //   sl.numero_credito AS 'numero_credito',
-    //   cl.nombre_completo AS 'cliente',
-    //   cl.nro_identificacion AS 'identificacion_cliente',
-    //   sl.valor_solicitado AS 'valor_solicitado',
-    //   es.nombre AS 'estado',
-    //   us_asesor.nombre_completo AS 'asesor',
-    //   us_auxiliar.nombre_completo AS 'auxiliar',
-    //   sl.created_at AS 'fecha_creacion'
-    //   FROM solicitudes sl
-    //   INNER JOIN clientes cl ON cl.cliente_id = sl.cliente_id
-    //   INNER JOIN estados es ON sl.estado_id = es.id_estado
-    //   LEFT JOIN usuarios us_asesor ON us_asesor.id_usuario = sl.asesor_id
-    //   LEFT JOIN usuarios us_auxiliar ON us_auxiliar.id_usuario = sl.auxiliar_id WHERE sl.id_solicitud = :id_solicitud";
 
-    // $stmtDetail = $this->conn->prepare($sql);
-
-    // $stmtDetail->bindValue(":id_solicitud", $idSolicitud, PDO::PARAM_INT);
-
-    // $stmtDetail->execute();
-
-    // $detail = $stmtDetail->fetchAll(PDO::FETCH_ASSOC);
-
-    // var_dump($detail);
-
-
-    // var_dump($idSolicitud);
     var_dump($idSolicitud);
     die();
 
-    return true;
+    return $resultDetail;
   }
+  public function update(array $datos = [])
+  {
+    $prepareUpdate['data'] = $datos;
+    $resultUpdate = $this->mlSolicitudCredito->update($datos)->where(false, 'id_solicitud', $datos)->prepareSql($prepareUpdate)->get();
+    return $resultUpdate;
+  }
+
   public function count()
   {
     return $this->mlSolicitudCredito->select()->count()->prepareSql()->get();

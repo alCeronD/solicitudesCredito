@@ -150,5 +150,14 @@ TRUNCATE TABLE `logSolicitud`;
 
 SELECT * FROM logSolicitud;
 SELECT * FROM solicitudes;
+SELECT * FROM clientes;
+
+SELECT * FROM usuarios;
 
 DELETE FROM solicitudes;
+
+
+UPDATE solicitudes SET estado_id = 1 WHERE id_solicitud = 1;
+SELECT * FROM `logSolicitud`;
+
+SELECT * FROM solicitudes;

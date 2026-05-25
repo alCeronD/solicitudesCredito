@@ -57,7 +57,6 @@ class SolicitudesCreditoController
     // $resultPost = $this->gstSC->insertSolicitud($data);
     $resultPost = $this->gstSC->insertSolicitud($data);
     $idSolicitud = (int)$resultPost;
-    var_dump($idSolicitud);
     if ($resultPost) {
       // creamos el log luego de validar que todo el proceso fue exitoso.
       $dataEncode = Utils::returnGetEncode($data);
@@ -71,6 +70,30 @@ class SolicitudesCreditoController
         Response::success('Solicitud creada exitosamente', [$resultPost]);
       }
     }
+  }
+
+  public function actualizarSolicitud()
+  {
+    header('Content-Type: application/json; charset=utf-8');
+    $data = Utils::returnGetDecode();
+    $resultActualizarSolicitud = $this->gstSC->update($data);
+    if ($resultActualizarSolicitud) {
+      $idSolicitud = $data['id_solicitud'];
+      if ($resultActualizarSolicitud) {
+        // creamos el log luego de validar que todo el proceso fue exitoso.
+        $dataEncode = Utils::returnGetEncode($data);
+        $datosLog['id_solicitud'] = $idSolicitud;
+        $datosLog['nombre_proceso'] = "UPDATE";
+        $datosLog['informacion'] = $dataEncode;
+        $datosLog['created_at'] = "";
+        $datosLog['updated_at'] = "";
+        $resultLog = $this->gstLog->createLog($datosLog);
+        if ($resultLog) {
+          Response::success("Solicitud nro $idSolicitud aprobada por validación documental", [$resultActualizarSolicitud]);
+        }
+      }
+    }
+    die();
   }
 
   public function getSolicitudes()
@@ -130,7 +153,9 @@ class SolicitudesCreditoController
     header('Content-Type: application/json; charset=utf-8');
 
     $data = Utils::returnGetDecode();
-    $this->gstSC->getDetail($data);
-    die();
+    $result = $this->gstSC->getDetail($data);
+    if (!empty($result)) {
+      Response::success('Detalle de solicitud', $result);
+    }
   }
 }

@@ -92,7 +92,7 @@ abstract class Crud
     foreach ($datos as $key => $value) {
 
       if (in_array($key, $this->campos)) {
-        $sql .= "$key = ? ,";
+        $sql .= "$key = :$key ,";
       }
     }
     return trim($sql, ", ");
