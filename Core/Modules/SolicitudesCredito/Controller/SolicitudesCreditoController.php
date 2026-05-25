@@ -6,6 +6,7 @@ include_once __DIR__ . '/../../../Helpers/Response.php';
 include_once __DIR__ . '/../../Clientes/Controller/GstClientes.php';
 include_once __DIR__ . '/../../LogSolicitudes/Controller/GstLogSolicitudes.php';
 include_once __DIR__ . '/../../Estados/Controller/GstEstados.php';
+include_once __DIR__ . '/../../Usuarios/Controller/GstUsuarios.php';
 
 
 class SolicitudesCreditoController
@@ -14,12 +15,14 @@ class SolicitudesCreditoController
   protected GstClientes $gstClientes;
   protected GstLogSolicitudes $gstLog;
   protected GstEstado $gstEstados;
+  protected GstUsuarios $gstUsuarios;
   public function __construct()
   {
     $this->gstSC = new GstSolicitudesCredito();
     $this->gstClientes = new GstClientes();
     $this->gstLog = new GstLogSolicitudes();
     $this->gstEstados = new GstEstado();
+    $this->gstUsuarios = new GstUsuarios();
   }
 
   public function renderMainView()
@@ -42,6 +45,11 @@ class SolicitudesCreditoController
       Response::success('El numero de credito es obligatorio', [$data['numero_credito']]);
     }
 
+    // valido si el numero de credito me llega como string.
+    if (is_int($data['numero_credito'])) {
+      Response::success('El tipo de dato del numero de credito es incorrecto', [$data['numero_credito']]);
+    }
+
     if (empty($data['valor_solicitado']) || $data['valor_solicitado'] <= 0) {
       Response::success('Valor solicitado incorrecto, el campo es obligatorio y su valor como minimo es 1', [0]);
     }
@@ -57,7 +65,18 @@ class SolicitudesCreditoController
     if ($numero_credito === $data['numero_credito']) {
       Response::success("El numero de credito $numero_credito ya existe", [$numero_credito]);
     }
-    // $resultPost = $this->gstSC->insertSolicitud($data);
+
+    // validar existencia del asesor o auxiliar
+    $existAsesor = $this->gstUsuarios->getUserId('id_usuario', true, $data);
+    $existAsesorAuxiliar = $this->gstUsuarios->getUserId('id_usuario', false, $data);
+
+    if (count($existAsesor) === 0 || count($existAsesorAuxiliar) === 0) {
+      Response::success('datos de auxiliar o asesor incorrectos', []);
+    }
+
+
+
+
     $resultPost = $this->gstSC->insertSolicitud($data);
     $idSolicitud = (int)$resultPost;
     if ($resultPost) {
@@ -95,10 +114,14 @@ class SolicitudesCreditoController
 
     // validar no cambiar solicitud en estado deseembolzada
     if ($resultDuplicateSolicitud[0]['estado_id'] === 5) {
-      Response::success('No es posible cambiar una solicitod ya reembolzadad', []);
+      Response::success('No es posible cambiar una solicitud ya reembolzada', []);
     }
 
-    // validar no pasar estado rechazada a aprobada.
+    // var_dump($resultDuplicateSolicitud);
+    // 4 rechazada, 3 aprobada
+    if ($resultDuplicateSolicitud[0]['estado_id'] === 4 && $data['estado_id'] === 3) {
+      Response::success('Solicitud actual es rechazada, no se puede cambiar al estado aprobado', []);
+    }
 
     $resultActualizarSolicitud = $this->gstSC->update($data);
     if ($resultActualizarSolicitud) {
@@ -177,8 +200,10 @@ class SolicitudesCreditoController
 
     $data = Utils::returnGetDecode();
     $result = $this->gstSC->getDetail($data);
-    if (!empty($result)) {
-      Response::success('Detalle de solicitud', $result);
+    if (empty($result)) {
+      Response::success('la solicitud no existe', $result);
     }
+
+    Response::success('Detalle de solicitud', $result);
   }
 }

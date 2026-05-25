@@ -27,7 +27,5 @@ class SolicitudesCreditoModel extends Crud
     'created_at' => 's',
     'updated_at' => 's'
   ];
-
-
   protected $typeId = 'i';
 }

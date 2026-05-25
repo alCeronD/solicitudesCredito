@@ -103,6 +103,13 @@ class GstSolicitudesCredito
     $this->mlSolicitudCredito->select(true);
     // Extraemos la solicitud
     $resultSolicitudId = $this->mlSolicitudCredito->where(true, 'id_solicitud')->prepareSql($dataId)->get();
+
+    if (empty($resultSolicitudId)) {
+      return [];
+    }
+
+    // var_dump($resultSolicitudId);
+    // die();
     // Extraemos las keys relevantes para formar el detail.
     $asesorId = $resultSolicitudId[0]['asesor_id'];
     $auxiliarId = $resultSolicitudId[0]['auxiliar_id'];
@@ -133,8 +140,9 @@ class GstSolicitudesCredito
     unset($resultDetail['asesor_id']);
     unset($resultDetail['auxiliar_id']);
 
+    return (empty($resultDetail)) ? ['No existe la solicitud'] : $resultDetail;
 
-    return $resultDetail;
+    // return $resultDetail;
   }
   public function update(array $datos = [])
   {

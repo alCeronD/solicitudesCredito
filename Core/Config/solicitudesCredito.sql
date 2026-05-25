@@ -162,6 +162,64 @@ DELETE FROM solicitudes;
 UPDATE solicitudes SET estado_id = 1 WHERE id_solicitud = 1;
 SELECT * FROM `logSolicitud`;
 
-SELECT * FROM estados;
+SELECT * FROM solicitudes;
 
 DESC estados;
+
+
+
+# PUNTO 4, CONSULTAS:
+
+# Reporte general 4.1
+SELECT
+      sl.numero_credito AS 'numero_credito',
+      cl.nro_identificacion AS 'identificacion_cliente',
+      cl.nombre_completo AS 'nombre_cliente',
+      sl.valor_solicitado AS 'valor_solicitado',
+      es.nombre AS 'estado',
+      us_asesor.nombre_completo AS 'nombre asesor',
+      us_auxiliar.nombre_completo AS 'nombre auxiliar',
+      sl.created_at AS 'fecha_creacion',
+      sl.updated_at AS 'ultima_fecha_cambio_estado'
+      FROM solicitudes sl
+      INNER JOIN clientes cl ON cl.cliente_id = sl.cliente_id
+      INNER JOIN estados es ON sl.estado_id = es.id_estado
+      LEFT JOIN usuarios us_asesor ON us_asesor.id_usuario = sl.asesor_id
+      LEFT JOIN usuarios us_auxiliar ON us_auxiliar.id_usuario = sl.auxiliar_id WHERE sl.created_at BETWEEN '2026-03-25' AND '2026-05-25';
+
+# clientes con solicitudes activas duplicadas. 4.2
+SELECT
+      cl.nro_identificacion AS 'identificacion_cliente',
+      cl.nombre_completo AS 'nombre_cliente',
+      sl.valor_solicitado AS 'valor_solicitado',
+      es.nombre AS 'estado',
+      COUNT(sl.estado_id) AS total_estados
+FROM clientes cl
+LEFT JOIN solicitudes sl ON sl.cliente_id = cl.cliente_id
+INNER JOIN estados es ON es.id_estado = sl.estado_id GROUP BY sl.cliente_id HAVING COUNT(sl.estado_id) > 1;
+
+# Ultimo estado desde log 4.3
+SELECT * FROM `logSolicitud`;
+
+
+# Crear una consulta que obtenga el último estado de cada solicitud usando el log de estados, sin depender directamente del campo estado_id de la tabla principal. Puede usar MAX(created_at) o ROW_NUMBER() OVER(PARTITION BY ...).
+
+
+# INDICES
+
+# FILTRO INDICES POR FECHA DE CREACION:
+ALTER TABLE solicitudes ADD INDEX index_created_at (created_at);
+
+# FILTRO INDICE POR ESTADO - Esta ya se encuentra creada cuando se hace la relacion a la tabla estados.
+
+ALTER TABLE solicitudes ADD INDEX fk_id_estado (estado_id);
+
+# FILTRO INDICE IDENTIFICACION DEL CLIENTE -
+
+ALTER TABLE clientes ADD UNIQUE INDEX index_nro_identificacion (nro_identificacion);
+
+# FILTRO ENTRE SOLICITUD Y LOG DE ESTADOS
+ALTER TABLE `logSolicitud` ADD INDEX index_log (id_solicitud);
+
+
+
