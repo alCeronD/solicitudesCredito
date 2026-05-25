@@ -311,6 +311,8 @@ abstract class Crud
   }
 
   # Obtener el resultado sql y devolverlo
+
+
   public function get()
   {
     try {
@@ -319,24 +321,42 @@ abstract class Crud
 
       $this->stmt->execute();
 
-
-      # Verificamos si es un select para solamente devolver un arreglo asociativo
+      $sqlUpper = strtoupper($this->sql);
+      $resultadoFinal = null;
+      $id = null;
       if ((strpos($this->sql, 'SELECT') === 0) && ($checkSelect[0] === "SELECT")) {
-
-        if (str_contains(strtoupper($this->sql), "COUNT")) {
-          return (int) $this->stmt->fetchColumn();
+        if (str_contains($sqlUpper, "COUNT")) {
+          $resultadoFinal = (int) $this->stmt->fetchColumn();
+        } else {
+          $resultadoFinal = $this->stmt->fetchAll(PDO::FETCH_ASSOC);
         }
-
-        return $this->stmt->fetchAll(PDO::FETCH_ASSOC);
+      } elseif (str_contains($sqlUpper, "UPDATE")) {
+        $resultadoFinal = $this->stmt->rowCount();
+      } elseif (str_contains($sqlUpper, "INSERT INTO")) {
+        $resultadoFinal = (int) $this->conn->lastInsertId();
       }
 
-      if (str_contains(strtoupper($this->sql), "UPDATE")) {
-        return $this->stmt->rowCount();
+      if (str_contains($sqlUpper, "INSERT INTO")) {
+        $id = $this->conn->lastInsertId();
+        $resultadoFinal = $id;
       }
+
+
+      if (str_contains($sqlUpper, "INSERT INTO")) {
+        $this->stmt = null;
+        $this->sql = "";
+        return $id;
+      } else {
+        $this->sql = "";
+        $this->stmt = null;
+        return $resultadoFinal;
+      }
+
+      return $resultadoFinal;
+    } catch (\Exception $e) {
+
       $this->sql = "";
       $this->stmt = null;
-      return true;
-    } catch (\Exception $e) {
       return $e->getMessage();
     }
   }

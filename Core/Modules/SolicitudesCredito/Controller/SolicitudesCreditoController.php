@@ -54,10 +54,14 @@ class SolicitudesCreditoController
     if ($numero_credito === $data['numero_credito']) {
       Response::success("El numero de credito $numero_credito ya existe", [$numero_credito]);
     }
-    $resultPost = $this->gstSC->insert($data);
+    // $resultPost = $this->gstSC->insertSolicitud($data);
+    $resultPost = $this->gstSC->insertSolicitud($data);
+    $idSolicitud = (int)$resultPost;
+    var_dump($idSolicitud);
     if ($resultPost) {
       // creamos el log luego de validar que todo el proceso fue exitoso.
       $dataEncode = Utils::returnGetEncode($data);
+      $datosLog['id_solicitud'] = $idSolicitud;
       $datosLog['nombre_proceso'] = "CREATE";
       $datosLog['informacion'] = $dataEncode;
       $datosLog['created_at'] = "";
@@ -119,5 +123,14 @@ class SolicitudesCreditoController
     }
 
     Response::success("Solicitudes encontradas $countSolicitudes", $resultSelect);
+  }
+
+  public function verDetalle()
+  {
+    header('Content-Type: application/json; charset=utf-8');
+
+    $data = Utils::returnGetDecode();
+    $this->gstSC->getDetail($data);
+    die();
   }
 }

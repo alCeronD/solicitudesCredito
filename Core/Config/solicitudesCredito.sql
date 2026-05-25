@@ -22,6 +22,8 @@ ALTER TABLE clientes
     ADD COLUMN nro_identificacion INT(11) NOT NULL UNIQUE AFTER id_cliente;
 
 ALTER TABLE clientes MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE clientes RENAME COLUMN id_cliente TO cliente_id;
+
 DESC clientes;
 
 SHOW CREATE TABLE clientes;
@@ -110,45 +112,8 @@ CREATE TABLE IF NOT EXISTS logSolicitud(
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='historico de logs en donde se almacena cuando se hacen el cambio de estado de las solicitudes';
 
-
-SELECT * FROM solicitudes WHERE numero_credito = "532334";
-
-DESC clientes;
-
-ALTER TABLE clientes RENAME COLUMN id_cliente TO cliente_id;
-
-SHOW TABLES;
-
-DESC `logSolicitud`;
-
-SHOW CREATE TABLE logSolicitud;
-
-SELECT * FROM `logSolicitud`;
-
-SELECT * FROM solicitudes;
-
-
-
-# GET solicitudes
-SELECT
-sl.id_solicitud AS 'increment',
-sl.numero_credito AS 'numero_credito',
-cl.nombre_completo AS 'cliente',
-cl.nro_identificacion AS 'identificacion_cliente',
-sl.valor_solicitado AS 'valor_solicitado',
-es.nombre AS 'estado',
-us_asesor.nombre_completo AS 'asesor',
-us_auxiliar.nombre_completo AS 'auxiliar',
-sl.created_at AS 'fecha_creacion'
-FROM solicitudes sl
-INNER JOIN clientes cl ON cl.cliente_id = sl.cliente_id
-INNER JOIN estados es ON sl.estado_id = es.id_estado
-LEFT JOIN usuarios us_asesor ON us_asesor.id_usuario = sl.asesor_id
-LEFT JOIN usuarios us_auxiliar ON us_auxiliar.id_usuario = sl.auxiliar_id ORDER BY sl.id_solicitud ASC LIMIT 3 OFFSET 0;
-
-
-SELECT * FROM solicitudes;
-
+ALTER TABLE `logSolicitud` RENAME COLUMN id_solicitud TO id_log;
+ALTER TABLE `logSolicitud` MODIFY COLUMN id_solicitud INT(11) NOT NULL AFTER id_log;
 
 SELECT
       sl.numero_credito AS 'numero_credito',
@@ -163,30 +128,27 @@ SELECT
       INNER JOIN clientes cl ON cl.cliente_id = sl.cliente_id
       INNER JOIN estados es ON sl.estado_id = es.id_estado
       LEFT JOIN usuarios us_asesor ON us_asesor.id_usuario = sl.asesor_id
-      LEFT JOIN usuarios us_auxiliar ON us_auxiliar.id_usuario = sl.auxiliar_id WHERE us_asesor.id_usuario = 1 ORDER BY sl.id_solicitud ASC  LIMIT 3 OFFSET 0;
+      LEFT JOIN usuarios us_auxiliar ON us_auxiliar.id_usuario = sl.auxiliar_id WHERE sl.id_solicitud = 18;
 
 
+      DELETE FROM solicitudes;
+
+      SELECT * FROM clientes;
 
 
+INSERT INTO clientes(nro_identificacion,nombre_completo, telefono) VALUES('67930032','Isabel C', '3222334487');
 
-      SELECT
-      sl.numero_credito AS 'numero_credito',
-      cl.nombre_completo AS 'cliente',
-      cl.nro_identificacion AS 'identificacion_cliente',
-      sl.valor_solicitado AS 'valor_solicitado',
-      es.nombre AS 'estado',
-      us_asesor.nombre_completo AS 'asesor',
-      us_auxiliar.nombre_completo AS 'auxiliar',
-      sl.created_at AS 'fecha_creacion'
-      FROM solicitudes sl
-      INNER JOIN clientes cl ON cl.cliente_id = sl.cliente_id
-      INNER JOIN estados es ON sl.estado_id = es.id_estado
-      LEFT JOIN usuarios us_asesor ON us_asesor.id_usuario = sl.asesor_id
-      LEFT JOIN usuarios us_auxiliar ON us_auxiliar.id_usuario = sl.auxiliar_id  WHERE us_asesor.id_rol = 2 ORDER BY sl.id_solicitud ASC LIMIT 3 OFFSET 0;
+SELECT * FROM solicitudes;
 
+ALTER TABLE solicitudes AUTO_INCREMENT = 500;
 
-      SELECT * FROM usuarios WHERE id_rol = 2;
+DELETE FROM solicitudes;
 
-      SELECT * FROM roles;
+TRUNCATE TABLE solicitudes;
 
-SELECT * FROM clientes;
+TRUNCATE TABLE `logSolicitud`;
+
+SELECT * FROM logSolicitud;
+SELECT * FROM solicitudes;
+
+DELETE FROM solicitudes;
