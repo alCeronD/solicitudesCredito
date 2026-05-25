@@ -119,11 +119,21 @@ class GstSolicitudesCredito
     $resultAsesorInfo = $this->mlUser->select(true)->where(true, 'id_usuario')->prepareSql($dataAsesor)->get();
     $resultAuxiliarInfo = $this->mlUser->select(true)->where(true, 'id_usuario')->prepareSql($dataAuxiliar)->get();
     $resultHistoricoInfo = $this->mlLog->select(true)->where(true, 'id_solicitud')->prepareSql($dataHistorico)->get();
+    // var_dump(count($resultHistoricoInfo));
 
     $idSolicitud = $resultSolicitudId[0]['id_solicitud'];
+    $resultDetail['solicitud'] = $resultSolicitudId[0];
 
-    var_dump($idSolicitud);
-    die();
+    $resultDetail['cliente'] = $resultClienteInfo[0];
+    $resultDetail['asesor'] = $resultAsesorInfo[0];
+    $resultDetail['auxiliar'] = $resultAuxiliarInfo[0];
+    $resultDetail['historico'] = $resultHistoricoInfo;
+
+
+    unset($resultDetail['cliente_id']);
+    unset($resultDetail['asesor_id']);
+    unset($resultDetail['auxiliar_id']);
+
 
     return $resultDetail;
   }
