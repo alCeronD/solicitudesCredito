@@ -2,6 +2,22 @@
 
 ---
 
+### Contenido
+- [Prueba tecnica, respuestas](#prueba-tecnica-respuestas)
+    - [Contenido](#contenido)
+  - [Explicacion del proyecto](#explicacion-del-proyecto)
+    - [Modelo de datos](#modelo-de-datos)
+    - [Estructura de carpetas](#estructura-de-carpetas)
+    - [Instalacion y uso](#instalacion-y-uso)
+      - [Requerimientos minimos](#requerimientos-minimos)
+      - [Instalacion](#instalacion)
+      - [Uso del proyecto](#uso-del-proyecto)
+  - [RESPUESTAS PRUEBA TECNICA](#respuestas-prueba-tecnica)
+    - [3 Backend api rest](#3-backend-api-rest)
+    - [4 SQL OBLIGATORIO](#4-sql-obligatorio)
+    - [6 EVALUACIÓN DE CÓDIGO](#6-evaluación-de-código)
+    - [7 CONCEPTOS](#7-conceptos)
+
 ## Explicacion del proyecto
 
 ### Modelo de datos
@@ -57,7 +73,7 @@ En donde su uso es el siguiente:
 │   ├── Config # Carpeta con variables constantes y clases para la conexión en POO
 │   │   ├── Config.php # Configuración de credenciales de la base de datos y constantes globales
 │   │   ├── Conn.php # Clase manejador de conexión a la base de datos mediante PDO
-│   │   └── solicitudesCredito.sql # Script de la base de datos (Estructura e inserciones iniciales)
+│   │   └── solicitudesCredito.sql # Script en donde se trabajo, importar el que esta en la carpeta raiz.
 │   ├── Helpers # Carpeta con clases para reutilizar sus respectivas funciones
 │   │   ├── Const.php # Archivo con variables constantes (no se dio uso)
 │   │   ├── Crud.php # Clase general para la creación de consultas (Query Builder)
@@ -95,7 +111,7 @@ En donde su uso es el siguiente:
 ├── index.php # Punto de entrada único de la aplicación (Front Controller) en donde se ejecuta todo el proyecto
 ├── PRUEBA_TECNICA.MD # Documento con los requerimientos, alcance y directrices de la prueba técnica
 └── README.MD # Documentación general del proyecto (Instrucciones de instalación, arquitectura y uso de las APIs)
-
+└── solicitudescredito.sql #Archivo script para importar la base de datos.
 ```
 
 ### Instalacion y uso
@@ -445,3 +461,92 @@ ALTER TABLE clientes ADD UNIQUE INDEX index_nro_identificacion (nro_identificaci
 ALTER TABLE `logSolicitud` ADD INDEX index_log (id_solicitud);
 
 ```
+
+### 6 EVALUACIÓN DE CÓDIGO
+
+Respuesta: veo que falta el codigo de respuesta.
+
+```php
+
+public function store(Request $request)
+{
+    $solicitud = new Solicitud();
+    $solicitud->numero_credito = $request->numero_credito;
+    $solicitud->cliente_id = $request->cliente_id;
+    $solicitud->valor_solicitado = $request->valor_solicitado;
+    $solicitud->asesor_id = $request->asesor_id;
+    $solicitud->auxiliar_id = $request->auxiliar_id;
+    $solicitud->estado_id = 1;
+    $solicitud->save();
+
+    return response()->json([
+        'message' => 'Solicitud creada correctamente',
+        'data' => $solicitud
+    ]);
+
+        return response()->json([
+        'message' => 'Solicitud creada correctamente',
+        'data' => $solicitud
+    ], 200);
+}
+
+```
+
+### 7 CONCEPTOS
+
+- **BACKEND**
+
+1. ¿Qué es una transacción?
+   - Proceso en el cual se efectua un cambio en la base de datos
+2. ¿Qué problema soluciona un try/catch?
+   - Retornar un mensaje para el usuario en caso de una falla o en su defecto,si la lógica lo permite, continuar con el programa si es necesario.
+3. ¿Qué diferencia hay entre validación de entrada y regla de negocio?
+   - en la validacion de entrada definimos el tipo de dato requerido y se valida, en caso de no ser correcto, por lo general, devolvemos un respectivo mensaje al usuario indicando la no validacion del dato de entrada y la **regla de negocio** son caracteristicas establecidas para el flujo del programa, dependiendo de la posible entrada de datos, la logica de negocio actua de una manera u otra.
+
+5. ¿Por qué no conviene colocar toda la lógica en el controlador?
+  - No es rentable porque estamos dependiendo de muchas cosas en el controlador, como la validación de datos, los procesos transaccionales, entre otros.
+6. ¿Qué código HTTP usarías para creación exitosa, validación fallida, no autorizado, prohibido, no encontrado y error interno?
+   - creación exitosa:201
+   - validacion fallida: 400
+   - no autorizado: 401
+   - prohibido: 403
+   - no encontrado: 404
+   - error interno: 500
+
+- **SQL**
+
+1. Diferencia entre INNER JOIN y LEFT JOIN.
+   - INNER JOIN NOS PERMITE UNIFICAR N TABLAS y LEFT JOIN Cumple el mismo proposito pero esta da prioridad a la tabla referenciada.
+2. Qué es un índice.
+   - un punto de partida para una busqueda mas eficiente, en las tablas, dependiendo de la cantidad de datos que hay, con los indices podemos acceder a los registros de manera más rápida.
+3. Qué es una llave foránea.
+   - una llave referenciada con otra tabla para asi unificar la informacion y evitar redundancias
+4. Qué es una restricción UNIQUE.
+   - cuando en la columna se valida que no deben de haber datos repetidos
+5. Qué es una violación de cardinalidad.
+   - cuando según en la lógica de negocio se rompe la estructura, por ejemplo, cuando debe de haber una relacion 1:n e innecesariamente hay una relación n:m y viseversa
+6. Diferencia entre WHERE y HAVING.
+   - nos sirve para agrupa una serie de datos con unas reglas mas estrictas a comparación de WHERE, en el where se agrupan las filas de manera individual en el HAVING se usa para agrupar varias filas pero cuando se ha ejecutado un agrupamiento previo
+7. Para qué sirve GROUP BY.
+   - agrupar una serie de elementos segun nuestras necesidades
+8. Qué es una función de ventana como ROW_NUMBER().
+   - ordena el resultado de la consulta en orden secuencial
+
+- **FRONTEND**
+
+1. Qué es un componente.
+  - Es un bloque de código que nos permite re utilizarlo
+2. Qué diferencia hay entre estado local y props.
+3. Qué es una promesa.
+  - es algo que se ejecuta dependiendo del resultado de algo previo, como por ejemplo el resultado de un fetch.
+4. Qué diferencia hay entre async/await y .then().
+  - la diferencia entre ambos es que en async-await nos permite declarar y pausar la logica mientras se ejecuta un proceso, caso contrario a then.
+5. Cómo manejarías errores de una API.
+  - primero estandarizaria la respuesta y seria lo más descriptivo posible para que el usuario entienda el error presentado.
+6. Cómo evitarías que el usuario haga doble clic y envíe dos veces un formulario.
+  - bloqueando todos los campos del formulario una vez que en el evento submit el usuario haga click
+7. Qué es paginación del lado servidor.
+  - es entregar un fragmento de los registros de una tabla, si tenemos 1000 registros, la idea es entregar una pequeña parte y de lado del cliente que el usuario pueda interactuar con la pagina que desee mostrar, así poder visualizar los siguientes datos.
+8. Qué información pondrías en un estado de loading.
+  - "Ejecutando el proceso ... por favor espere"
+  - mostrar de manera visual con texto quemado que hace en el backend como por ejemplo "validando datos enviados... por favor espere", "creando solicitud, por favor espere".

@@ -108,8 +108,6 @@ class GstSolicitudesCredito
       return [];
     }
 
-    // var_dump($resultSolicitudId);
-    // die();
     // Extraemos las keys relevantes para formar el detail.
     $asesorId = $resultSolicitudId[0]['asesor_id'];
     $auxiliarId = $resultSolicitudId[0]['auxiliar_id'];
